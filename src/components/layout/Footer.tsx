@@ -88,7 +88,6 @@ export function Footer({ dict }: { dict: Dictionary }) {
         <p>
           © {year} {siteConfig.fullName}. {dict.footer.rights}
         </p>
-        {siteConfig.showConceptNote && <p className="text-mute/70">{dict.footer.concept}</p>}
       </div>
     </footer>
   );

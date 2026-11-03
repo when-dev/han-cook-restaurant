@@ -16,6 +16,7 @@ function Ticket({
   id: string;
   locale: Locale;
   tone: "cream" | "red";
+  /** Position/rotation plus the `hero-card-in` delay variables. */
   className: string;
 }) {
   const item = menuItems.find((m) => m.id === id);
@@ -38,25 +39,68 @@ function Ticket({
   );
 }
 
+/** Neon text = unlit glass tube underneath + lit copy on top (only its opacity animates). */
+function NeonText({ text, color, ignite }: { text: string; color: "red" | "amber"; ignite: string }) {
+  return (
+    <span className="relative block">
+      <span className={color === "red" ? "sign-tube-red" : "sign-tube-amber"}>{text}</span>
+      <span
+        aria-hidden="true"
+        className={`absolute inset-0 ${color === "red" ? "sign-lit-red" : "sign-lit-amber"} ${ignite}`}
+      >
+        {text}
+      </span>
+    </span>
+  );
+}
+
 function NeonSignboard({ locale }: { locale: Locale }) {
   return (
-    <div className="relative mx-auto aspect-[16/11] w-full max-w-[22rem] sm:aspect-[5/4] sm:max-w-[26rem] lg:max-w-[34rem]">
-      {/* Wall glow behind the sign */}
-      <div aria-hidden="true" className="bg-chili/40 absolute inset-[12%] rounded-full blur-[70px]" />
-      <div className="neon-frame bg-ink/70 absolute inset-[8%_6%_14%] flex flex-col items-center justify-center rounded-[2rem] backdrop-blur-sm">
-        <span className="font-hangul neon-red animate-flicker text-[clamp(4rem,19vw,9.5rem)] leading-[0.9]">한쿡</span>
-        <span className="font-display neon-amber mt-3 text-[clamp(1.4rem,6vw,2.4rem)] font-extrabold tracking-[0.2em]">
-          HANCOOK
-        </span>
-        <span className="text-cream/60 mt-2 text-[0.65rem] font-semibold tracking-[0.4em] uppercase">
-          Korean Restaurant · <span className="font-bold tracking-normal">한식당</span>
-        </span>
+    <div className="sign-scene relative mx-auto aspect-[16/11] w-full max-w-[22rem] sm:aspect-[5/4] sm:max-w-[26rem] lg:max-w-[34rem]">
+      {/* Light the sign throws on the wall: blooms when the neon comes on. */}
+      <div aria-hidden="true" className="sign-ambient bg-chili/45 absolute inset-[12%] rounded-full blur-[70px]" />
+      <div
+        aria-hidden="true"
+        className="sign-ambient absolute inset-x-[4%] bottom-[2%] h-[22%] bg-[radial-gradient(ellipse_at_50%_0%,rgba(227,36,43,.32),transparent_70%)]"
+      />
+
+      {/* The sign itself drops in on its wires, still dark. */}
+      <div className="sign-drop absolute inset-0">
+        <span aria-hidden="true" className="absolute -top-40 left-[22%] h-[calc(8%+10rem)] w-px bg-white/25" />
+        <span aria-hidden="true" className="absolute -top-40 right-[22%] h-[calc(8%+10rem)] w-px bg-white/25" />
+        <div className="sign-frame-off bg-ink/80 absolute inset-[8%_6%_14%] flex flex-col items-center justify-center rounded-[2rem]">
+          <span
+            aria-hidden="true"
+            className="sign-frame-lit sign-ignite-frame pointer-events-none absolute -inset-[2px] rounded-[calc(2rem+2px)]"
+          />
+          <span
+            aria-hidden="true"
+            className="sign-boost pointer-events-none absolute -inset-[2px] rounded-[calc(2rem+2px)]"
+          />
+          <span className="font-hangul relative text-[clamp(4rem,19vw,9.5rem)] leading-[0.9]">
+            <NeonText text="한쿡" color="red" ignite="sign-ignite-red" />
+          </span>
+          <span className="font-display relative mt-3 text-[clamp(1.4rem,6vw,2.4rem)] font-extrabold tracking-[0.2em]">
+            <NeonText text="HANCOOK" color="amber" ignite="sign-ignite-amber" />
+          </span>
+          <span className="sign-subline text-cream/60 relative mt-2 text-[0.65rem] font-semibold tracking-[0.4em] uppercase">
+            Korean Restaurant · <span className="font-bold tracking-normal">한식당</span>
+          </span>
+        </div>
       </div>
-      {/* Hanging wires */}
-      <span aria-hidden="true" className="absolute top-0 left-[22%] h-[8%] w-px bg-white/25" />
-      <span aria-hidden="true" className="absolute top-0 right-[22%] h-[8%] w-px bg-white/25" />
-      <Ticket id="kimchi-jjigae" locale={locale} tone="cream" className="-bottom-6 -left-2 hidden -rotate-6 sm:block lg:-left-10" />
-      <Ticket id="tteokbokki" locale={locale} tone="red" className="-right-2 -bottom-10 hidden rotate-[5deg] sm:block lg:-right-8" />
+
+      <Ticket
+        id="kimchi-jjigae"
+        locale={locale}
+        tone="cream"
+        className="hero-card-in -bottom-6 -left-2 hidden -rotate-6 [--d-sm:1500ms] sm:block lg:-left-10"
+      />
+      <Ticket
+        id="tteokbokki"
+        locale={locale}
+        tone="red"
+        className="hero-card-in -right-2 -bottom-10 hidden rotate-[5deg] [--d-sm:1620ms] sm:block lg:-right-8"
+      />
     </div>
   );
 }
@@ -70,7 +114,10 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   ];
 
   return (
-    <section aria-labelledby="hero-title" className="bg-ink grain relative isolate overflow-hidden pt-20 pb-16 md:pt-32 lg:min-h-[100svh] lg:pb-24">
+    <section
+      aria-labelledby="hero-title"
+      className="bg-ink grain relative isolate overflow-hidden pt-20 pb-16 md:pt-32 lg:min-h-[100svh] lg:pb-24"
+    >
       {/* Night-street atmosphere */}
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <div className="bg-chili/30 absolute -top-40 right-[-10%] size-[38rem] rounded-full blur-[120px]" />
@@ -82,8 +129,8 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       </div>
 
       <div className="container-site grid items-center gap-14 lg:min-h-[calc(100svh-12rem)] lg:grid-cols-[1.05fr_1fr] lg:gap-10">
-        <div className="animate-rise order-2 flex flex-col gap-7 lg:order-1">
-          <p className="inline-flex w-fit items-center gap-2.5 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-xs font-bold tracking-[0.18em] text-cream/85 uppercase backdrop-blur">
+        <div className="order-2 flex flex-col gap-7 lg:order-1">
+          <p className="hero-in inline-flex w-fit items-center [--d-lg:450ms] [--d-sm:0ms] gap-2.5 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-xs font-bold tracking-[0.18em] text-cream/85 uppercase backdrop-blur">
             <span className="relative flex size-2">
               <span className="bg-chili absolute inset-0 animate-ping rounded-full opacity-70" />
               <span className="bg-chili relative size-2 rounded-full" />
@@ -91,18 +138,32 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             {h.eyebrow}
           </p>
 
-          <h1 id="hero-title" className="font-display flex flex-col font-extrabold tracking-[-0.035em]">
+          <h1
+            id="hero-title"
+            className="hero-in font-display flex flex-col [--d-lg:600ms] [--d-sm:60ms] font-extrabold tracking-[-0.035em]"
+          >
             <span className="sr-only">HanCook — </span>
             <span className="text-cream text-[clamp(2.4rem,7.5vw,5rem)] leading-[0.95]">{h.titleTop}</span>
-            <span className="neon-red text-[clamp(2.9rem,9.5vw,6.4rem)] leading-[0.98]">{h.titleAccent}</span>
+            {/* "Seoul at night": readable at once, its neon glow then gently intensifies. */}
+            <span className="relative text-[clamp(2.9rem,9.5vw,6.4rem)] leading-[0.98]">
+              <span className="neon-soft">{h.titleAccent}</span>
+              <span
+                aria-hidden="true"
+                className="neon-red hero-glow-in absolute inset-0 [--d-lg:1000ms] [--d-sm:700ms]"
+              >
+                {h.titleAccent}
+              </span>
+            </span>
             <span className="text-mute mt-2 text-[clamp(1.25rem,3.4vw,2rem)] leading-tight font-bold tracking-[-0.02em]">
               {h.titleBottom}
             </span>
           </h1>
 
-          <p className="text-cream/80 max-w-xl text-base leading-relaxed text-pretty md:text-lg">{h.lead}</p>
+          <p className="hero-in text-cream/80 max-w-xl text-base [--d-lg:900ms] [--d-sm:140ms] leading-relaxed text-pretty md:text-lg">
+            {h.lead}
+          </p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="hero-in flex flex-wrap gap-3 [--d-lg:1100ms] [--d-sm:200ms]">
             <a href="#menu" className={buttonClass("primary", "lg")}>
               {h.ctaMenu}
               <ArrowRight className="size-4 transition-transform group-hover/btn:translate-x-1" />
@@ -116,7 +177,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             </ButtonA>
           </div>
 
-          <ul className="flex flex-wrap gap-x-6 gap-y-3 pt-2 text-sm">
+          <ul className="hero-in flex flex-wrap gap-x-6 gap-y-3 pt-2 text-sm [--d-lg:1750ms] [--d-sm:320ms]">
             {chips.map(({ icon: Icon, text, live }) => (
               <li key={text} className="text-cream/80 flex items-center gap-2">
                 <Icon className={`size-4 ${live ? "text-[#4ade80]" : "text-amber"}`} />
