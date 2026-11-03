@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Design tokens ───────────────────────── */
+@theme {
+  --color-ink: #0c0a0b;
+  --color-night: #141114;
+  --color-coal: #1d191c;
+  --color-smoke: #2a2428;
+  --color-cream: #f6ecdc;
+  --color-paper: #efe1c9;
+  --color-kraft: #d9c3a0;
+  --color-chili: #e3242b;
+  --color-chili-deep: #a8121a;
+  --color-ember: #ff7a1a;
+  --color-amber: #ffb627;
+  --color-neon-pink: #ff3d8b;
+  --color-neon-blue: #38d6ff;
+  --color-mute: #b9ada3;
+  --color-mute-ink: #5d5148;
+
+  --font-display: var(--font-bricolage), var(--font-blackhan), ui-sans-serif, system-ui, sans-serif;
+  --font-hangul: var(--font-blackhan), var(--font-bricolage), sans-serif;
+  --font-sans: var(--font-jakarta), var(--font-notokr), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-flicker: flicker 7s linear infinite;
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+      opacity: 1;
+    }
+    20%, 24%, 55% {
+      opacity: 0.55;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+@layer base {
+  html {
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-ink);
+  }
+  body {
+    overflow-x: clip;
+    background: var(--color-ink);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Black Han Sans ships a single weight — never let the browser fake-bold it. */
+  html {
+    font-synthesis-weight: none;
+  }
+  :lang(ko) body {
+    word-break: keep-all;
+  }
+  :lang(ko) :is(h1, h2, h3) {
+    letter-spacing: -0.01em;
+  }
+  section[id] {
+    scroll-margin-top: 4.5rem;
+  }
+  ::selection {
+    background: var(--color-chili);
+    color: var(--color-cream);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ───────────────────────── Utilities ───────────────────────── */
+
+/* Red neon tube text — layered glow, tuned to stay readable. */
+@utility neon-red {
+  color: #ffe9e4;
+  text-shadow:
+    0 0 2px #fff4f0,
+    0 0 8px #ff5a4f,
+    0 0 18px #e3242b,
+    0 0 38px #e3242b,
+    0 0 70px rgba(227, 36, 43, 0.6);
+}
+@utility neon-amber {
+  color: #fff3dc;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 10px #ffb627,
+    0 0 26px #ff7a1a,
+    0 0 50px rgba(255, 122, 26, 0.55);
+}
+@utility neon-frame {
+  border: 2px solid #ffd9d2;
+  box-shadow:
+    0 0 6px #ff5a4f,
+    0 0 18px #e3242b,
+    0 0 42px rgba(227, 36, 43, 0.55),
+    inset 0 0 12px rgba(227, 36, 43, 0.6),
+    inset 0 0 30px rgba(227, 36, 43, 0.25);
+}
+@utility glow-red {
+  box-shadow:
+    0 0 0 1px rgba(255, 120, 110, 0.35),
+    0 8px 28px -6px rgba(227, 36, 43, 0.75),
+    0 0 46px -10px rgba(255, 90, 60, 0.7);
+}
+
+/* Warm paper with fine grain — used for the menu and review sections. */
+@utility paper {
+  background-color: var(--color-cream);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(ellipse at 90% 100%, rgba(217, 195, 160, 0.45), transparent 55%);
+  color: var(--color-ink);
+}
+
+/* Poster halftone dots for the red panels. */
+@utility halftone {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.16) 1.2px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+
+/* Dark grain for night sections. */
+@utility grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility container-site {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Lighter glow for small neon text (logo badge) so glyphs stay crisp. */
+@utility neon-soft {
+  color: #ffeae6;
+  text-shadow:
+    0 0 6px rgba(255, 90, 79, 0.9),
+    0 0 14px rgba(227, 36, 43, 0.6);
+}
