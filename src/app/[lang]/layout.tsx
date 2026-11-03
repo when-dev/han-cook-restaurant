@@ -7,7 +7,9 @@ import { I18nProvider } from "@/i18n/client";
 import { isLocale, localeTags, locales } from "@/i18n/config";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { BackToTop } from "@/components/layout/BackToTop";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
+import { SmoothAnchors } from "@/components/layout/SmoothAnchors";
 import { RestaurantJsonLd } from "@/components/JsonLd";
 import "../globals.css";
 
@@ -120,6 +122,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           </main>
           <Footer dict={dict} />
           <MobileActionBar />
+          <BackToTop />
+          <SmoothAnchors />
         </I18nProvider>
         <RestaurantJsonLd locale={lang} description={dict.meta.description} />
       </body>

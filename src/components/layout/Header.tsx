@@ -2,9 +2,10 @@
 
 import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { siteConfig } from "@/config/site";
 import { useI18n } from "@/i18n/client";
+import { NAVIGATE_END_EVENT, NAVIGATE_EVENT, currentSectionId, scrollToTop } from "@/lib/smoothScroll";
 import { navItems, sectionIds, type SectionId } from "@/lib/sections";
 import { buttonClass } from "@/components/ui/Button";
 import { InstagramIcon } from "@/components/ui/Icons";
@@ -18,43 +19,76 @@ export function Header() {
   const [active, setActive] = useState<SectionId | null>(null);
   const items = navItems(dict);
 
+  // While a nav click is scrolling us to its target, keep that item lit instead of
+  // flickering through every section passed on the way.
+  const lockUntil = useRef(0);
+
+  // One rAF-throttled scroll handler: header background + active section.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 24);
+      if (performance.now() < lockUntil.current) return;
+      const id = currentSectionId();
+      setActive(id && (sectionIds as readonly string[]).includes(id) ? (id as SectionId) : null);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const release = () => {
+      lockUntil.current = 0;
+      onScroll();
+    };
+    const onNavigate = (e: Event) => {
+      const id = (e as CustomEvent<string | null>).detail;
+      setActive(id && (sectionIds as readonly string[]).includes(id) ? (id as SectionId) : null);
+      lockUntil.current = performance.now() + 2000; // safety net if the end event is missed
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener(NAVIGATE_END_EVENT, release);
+    window.addEventListener(NAVIGATE_EVENT, onNavigate);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      window.removeEventListener(NAVIGATE_END_EVENT, release);
+      window.removeEventListener(NAVIGATE_EVENT, onNavigate);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
-  // Highlight the section currently in view.
-  useEffect(() => {
-    const els = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => !!el);
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries)
-          if (entry.isIntersecting) setActive(entry.target.id as SectionId);
-      },
-      { rootMargin: "-45% 0px -50% 0px" },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  // Lock page scroll and close on Escape while the mobile sheet is open.
-  useEffect(() => {
+  // Mobile sheet: lock page scroll on <html> (the real scroller — body can't lock it because
+  // <html> has overflow-x: clip). Layout effect, so the lock is released synchronously when a
+  // link closes the sheet, before the smooth scroll starts.
+  useLayoutEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
+    // Close if the viewport grows to desktop, where the sheet is hidden anyway.
+    const mq = window.matchMedia("(min-width: 64rem)");
+    const onMq = () => mq.matches && setOpen(false);
     window.addEventListener("keydown", onKey);
+    mq.addEventListener("change", onMq);
     return () => {
-      document.body.style.overflow = prev;
+      root.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
+      mq.removeEventListener("change", onMq);
     };
   }, [open]);
+
+  // Logo = "Home": already on this page, so glide to the top instead of re-navigating.
+  const onLogo = (e: MouseEvent<HTMLAnchorElement>) => {
+    setOpen(false);
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    scrollToTop();
+  };
 
   return (
     <>
@@ -66,12 +100,7 @@ export function Header() {
         }`}
       >
         <div className="container-site flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
-          <Link
-            href={`/${locale}`}
-            aria-label={siteConfig.fullName}
-            onClick={() => setOpen(false)}
-            className="shrink-0"
-          >
+          <Link href={`/${locale}`} aria-label={siteConfig.fullName} onClick={onLogo} className="shrink-0">
             <Wordmark />
           </Link>
 
@@ -83,9 +112,7 @@ export function Header() {
                     href={`#${item.id}`}
                     aria-current={active === item.id ? "true" : undefined}
                     className={`relative rounded-full px-3.5 py-2 text-sm font-semibold transition-colors ${
-                      active === item.id
-                        ? "text-white"
-                        : "text-cream/70 hover:text-white"
+                      active === item.id ? "text-white" : "text-cream/70 hover:text-white"
                     }`}
                   >
                     {item.label}
@@ -103,10 +130,7 @@ export function Header() {
 
           <div className="flex items-center gap-2.5">
             <LanguageSwitcher className="hidden sm:block" />
-            <a
-              href="#order"
-              className={buttonClass("primary", "md", "max-md:hidden")}
-            >
+            <a href="#order" className={buttonClass("primary", "md", "max-md:hidden")}>
               {dict.nav.order}
             </a>
             <button
@@ -128,7 +152,7 @@ export function Header() {
       <div
         id="mobile-nav"
         hidden={!open}
-        className="bg-ink grain fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto md:top-[4.5rem] lg:hidden"
+        className="bg-ink grain fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto overscroll-contain md:top-[4.5rem] lg:hidden"
       >
         <div className="container-site flex min-h-full flex-col gap-8 py-8">
           <LanguageSwitcher className="self-start sm:hidden" />
@@ -155,18 +179,11 @@ export function Header() {
             </ul>
           </nav>
           <div className="mt-auto flex flex-col gap-3 pb-6">
-            <a
-              href="#order"
-              onClick={() => setOpen(false)}
-              className={buttonClass("primary", "lg")}
-            >
+            <a href="#order" onClick={() => setOpen(false)} className={buttonClass("primary", "lg")}>
               {dict.hero.ctaOrder}
             </a>
             <div className="grid grid-cols-2 gap-3">
-              <a
-                href={siteConfig.phoneHref}
-                className={buttonClass("outline", "lg")}
-              >
+              <a href={siteConfig.phoneHref} className={buttonClass("outline", "lg")}>
                 <Phone className="size-4" /> {dict.contact.call}
               </a>
               <a

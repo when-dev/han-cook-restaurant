@@ -14,6 +14,7 @@ const sk = {
     externalLink: "otvorí sa v novom okne",
     scrollPrev: "Predchádzajúce kategórie",
     scrollNext: "Ďalšie kategórie",
+    backToTop: "Späť hore",
   },
   nav: {
     about: "O nás",

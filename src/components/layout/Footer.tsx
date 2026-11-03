@@ -42,7 +42,12 @@ export function Footer({ dict }: { dict: Dictionary }) {
           <h2 className={heading}>{dict.footer.visit}</h2>
           <ul className="flex flex-col gap-3 text-sm">
             <li>
-              <a href={siteConfig.maps.placeUrl} target="_blank" rel="noopener noreferrer" className={`${link} flex gap-2`}>
+              <a
+                href={siteConfig.maps.placeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${link} flex gap-2`}
+              >
                 <MapPin className="text-chili mt-0.5 size-4 shrink-0" />
                 <span>
                   {siteConfig.address.street}
@@ -72,7 +77,9 @@ export function Footer({ dict }: { dict: Dictionary }) {
             <span className="flex size-10 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#ffb627,#ff3d8b_55%,#7a3dff)] text-white">
               <InstagramIcon className="size-5" />
             </span>
-            <span className="text-sm font-semibold text-cream group-hover:text-white">{siteConfig.instagram.handle}</span>
+            <span className="text-sm font-semibold text-cream group-hover:text-white">
+              {siteConfig.instagram.handle}
+            </span>
           </a>
         </div>
       </div>

@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/i18n/client";
 import { localeTags, locales, type Locale } from "@/i18n/config";
+import { currentSectionId } from "@/lib/smoothScroll";
 
 function remember(locale: Locale) {
   document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; samesite=lax`;
 }
 
-/** Segmented SK / EN / 한 switch. Keeps the current section hash when switching. */
+/** Segmented SK / EN / 한 switch. Keeps the section you are reading when switching. */
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const { locale, dict } = useI18n();
   const router = useRouter();
@@ -28,14 +29,19 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
                 title={localeTags[l].name}
                 onClick={(e) => {
                   remember(l);
-                  const hash = window.location.hash;
-                  if (hash) {
+                  if (active || e.metaKey || e.ctrlKey || e.shiftKey) return;
+                  // Land on the same section in the new language (e.g. /en#menu), whatever
+                  // the visitor scrolled to — not a stale hash from an earlier click.
+                  const section = currentSectionId();
+                  if (section) {
                     e.preventDefault();
-                    router.push(`/${l}${hash}`);
+                    router.push(`/${l}#${section}`);
                   }
                 }}
                 className={`flex h-8 min-w-10 items-center justify-center rounded-full px-2.5 text-xs font-bold tracking-wider transition-colors ${
-                  active ? "bg-chili text-white shadow-[0_0_18px_-2px_rgba(227,36,43,.8)]" : "text-cream/70 hover:text-white"
+                  active
+                    ? "bg-chili text-white shadow-[0_0_18px_-2px_rgba(227,36,43,.8)]"
+                    : "text-cream/70 hover:text-white"
                 } ${l === "ko" ? "text-sm tracking-normal" : ""}`}
               >
                 {localeTags[l].label}

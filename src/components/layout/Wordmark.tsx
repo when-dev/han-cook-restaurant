@@ -9,7 +9,9 @@ export function Wordmark({ size = "md" }: { size?: "md" | "lg" }) {
         <span className="neon-soft">한쿡</span>
       </span>
       <span className="flex flex-col leading-none">
-        <span className={`font-display font-extrabold tracking-[-0.03em] text-cream ${lg ? "text-3xl" : "text-[1.35rem]"}`}>
+        <span
+          className={`font-display font-extrabold tracking-[-0.03em] text-cream ${lg ? "text-3xl" : "text-[1.35rem]"}`}
+        >
           Han<span className="text-chili">Cook</span>
         </span>
         <span

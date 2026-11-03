@@ -53,9 +53,17 @@
 
 /* ───────────────────────── Base ───────────────────────── */
 @layer base {
+  /* Fixed header height — drives section offsets and the scroll helpers in lib/smoothScroll.ts.
+     Smooth scrolling is done explicitly in JS (honouring reduced motion), not via CSS, so it
+     never leaks into Next.js route changes. */
+  :root {
+    --header-h: 4rem;
+    @media (width >= 48rem) {
+      --header-h: 4.5rem;
+    }
+  }
   html {
     overflow-x: clip;
-    scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
     background: var(--color-ink);
   }
@@ -77,8 +85,13 @@
   :lang(ko) :is(h1, h2, h3) {
     letter-spacing: -0.01em;
   }
+  /* Land headings just below the navbar, with a little breathing room. */
   section[id] {
-    scroll-margin-top: 4.5rem;
+    scroll-margin-top: calc(var(--header-h) + 0.5rem);
+  }
+  /* Sections receive focus after in-page navigation; no outline around a whole section. */
+  section[id][tabindex="-1"]:focus {
+    outline: none;
   }
   ::selection {
     background: var(--color-chili);
@@ -89,9 +102,6 @@
     outline-offset: 3px;
   }
   @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
     *,
     *::before,
     *::after {

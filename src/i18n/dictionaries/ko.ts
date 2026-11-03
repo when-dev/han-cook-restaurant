@@ -16,6 +16,7 @@ const ko: Dictionary = {
     externalLink: "새 창에서 열림",
     scrollPrev: "이전 카테고리",
     scrollNext: "다음 카테고리",
+    backToTop: "맨 위로 이동",
   },
   nav: {
     about: "소개",

@@ -16,6 +16,7 @@ const en: Dictionary = {
     externalLink: "opens in a new tab",
     scrollPrev: "Previous categories",
     scrollNext: "More categories",
+    backToTop: "Back to top",
   },
   nav: {
     about: "About",
