@@ -94,6 +94,7 @@ const en: Dictionary = {
     title: "Order online",
     lead: "Delivery or pickup. Choose your favourite platform.",
     soon: "Coming soon",
+    soonNote: "Link on the way",
     orderVia: "Order via {name}",
     direct: "Direct order",
     callToOrder: "Or call us and pick it up",

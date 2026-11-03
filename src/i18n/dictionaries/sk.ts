@@ -92,6 +92,7 @@ const sk = {
     title: "Objednajte online",
     lead: "Donáška aj vyzdvihnutie. Vyberte si svoju obľúbenú platformu.",
     soon: "Čoskoro",
+    soonNote: "Odkaz pripravujeme",
     orderVia: "Objednať cez {name}",
     direct: "Priama objednávka",
     callToOrder: "Alebo zavolajte a vyzdvihnite si",

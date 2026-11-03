@@ -94,6 +94,7 @@ const ko: Dictionary = {
     title: "온라인 주문",
     lead: "배달과 포장 모두 가능합니다. 편한 플랫폼을 선택하세요.",
     soon: "준비 중",
+    soonNote: "링크를 준비하고 있어요",
     orderVia: "{name}로 주문하기",
     direct: "직접 주문",
     callToOrder: "전화로 주문하고 포장해 가세요",
