@@ -14,6 +14,8 @@ const en: Dictionary = {
     spicyLevel: "Spice level: {level} of 3",
     rating: "Rated {rating} out of 5",
     externalLink: "opens in a new tab",
+    scrollPrev: "Previous categories",
+    scrollNext: "More categories",
   },
   nav: {
     about: "About",

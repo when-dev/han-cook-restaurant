@@ -14,6 +14,8 @@ const ko: Dictionary = {
     spicyLevel: "매운맛 {level}/3단계",
     rating: "별점 5점 중 {rating}점",
     externalLink: "새 창에서 열림",
+    scrollPrev: "이전 카테고리",
+    scrollNext: "다음 카테고리",
   },
   nav: {
     about: "소개",

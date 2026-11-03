@@ -12,6 +12,8 @@ const sk = {
     spicyLevel: "Pálivosť: {level} z 3",
     rating: "Hodnotenie {rating} z 5",
     externalLink: "otvorí sa v novom okne",
+    scrollPrev: "Predchádzajúce kategórie",
+    scrollNext: "Ďalšie kategórie",
   },
   nav: {
     about: "O nás",
