@@ -11,6 +11,7 @@ import { BackToTop } from "@/components/layout/BackToTop";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import { ScrollReset } from "@/components/layout/ScrollReset";
 import { SmoothAnchors } from "@/components/layout/SmoothAnchors";
+import { NeonDebug } from "@/components/sections/NeonDebug";
 import { RestaurantJsonLd } from "@/components/JsonLd";
 import "../globals.css";
 
@@ -85,6 +86,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
     formatDetection: { telephone: false, address: false, email: false },
     // Proposal build: keep out of search indexes until the owner approves.
     robots: siteConfig.showConceptNote ? { index: false, follow: false } : undefined,
+    // Build stamp in the HTML itself (debug panel compares it with the JS bundle's).
+    other: { "hancook-build": process.env.NEXT_PUBLIC_BUILD_ID ?? "dev" },
   };
 }
 
@@ -129,6 +132,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           <MobileActionBar />
           <BackToTop />
           <SmoothAnchors />
+          {/* Temporary: ?debugNeon=1 diagnostics for the hero intro on real devices. */}
+          <NeonDebug />
         </I18nProvider>
         <RestaurantJsonLd locale={lang} description={dict.meta.description} />
       </body>

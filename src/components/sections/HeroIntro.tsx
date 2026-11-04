@@ -8,32 +8,48 @@ import { SsrScript } from "@/components/layout/SsrScript";
  *   data-hero-intro="play"  running; the CSS animations play once and rest on their final, lit
  *                           frame (the idle hum keeps going) — nothing has to detect an "end".
  *
- * Root causes this fixes:
- *  - The intro was a plain CSS animation starting at HTML parse time. Mobile Safari often loads
- *    pages before showing them (address-bar / favourites preload, restored tabs, back/forward
- *    cache), so it could finish unseen. Now it only starts on a rendered frame while visible
- *    (requestAnimationFrame + visibilitychange / prerenderingchange; 1 s fallback so the hero
- *    copy can never stay hidden).
- *  - The previous version kept its state on <html> and removed it when a getAnimations()
- *    snapshot reported "all finished" — a snapshot whose timing depends on DOMContentLoaded and
- *    the engine, so on slow mobile loads it could end the intro right after the drop and the neon
- *    jumped straight to "lit". State now lives on the section and is never removed.
+ * The intro must start on the first frame the visitor can actually see. Signals, in order:
+ *  - page visible (visibilitychange / prerenderingchange cover background tabs and prerenders);
+ *  - first contentful paint reported (Paint Timing; skipped where unsupported);
+ *  - then the next requestAnimationFrame tick, i.e. the page is really producing frames.
+ * There is deliberately NO plain timer that starts the intro: iOS Safari ("Preload Top Hit") and
+ * Chrome for iOS ("Preload pages") load pages in a web view that is not on screen and produces no
+ * frames, while timers keep running — a timer fallback played the whole intro there, unseen, and
+ * the visitor got an already-lit sign. Without frames nothing is painted, so "wait" (copy hidden)
+ * can never be seen; if frames run but Paint Timing never reports, a frame-armed fallback starts.
+ *
  *  - A language switch renders a new section without this script (see SsrScript), so the intro
  *    never replays there; scrolling never touches it.
  *  - Back/forward cache restore with the hero in view: replay ("off" for one style flush resets
  *    every animation incl. the hum, then re-arm — within one task, so never painted).
  * Reduced motion: the script does nothing and the CSS resting state is the fully lit sign.
+ * `window.__neon` keeps a tiny event log for the `?debugNeon=1` panel (NeonDebug).
  */
 const script = `(function(){try{
-var s=document.currentScript&&document.currentScript.parentElement,A="data-hero-intro",fb=0;
-if(!s||!window.matchMedia||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+var s=document.currentScript&&document.currentScript.parentElement,A="data-hero-intro",P=performance,painted=false,fb=0;
+var N=window.__neon={el:s,ev:[],err:[]};
+function log(e){N.ev.push(Math.round(P.now())+" "+e+" ["+document.visibilityState+"]")}
+if(/[?&]debugNeon=1/.test(location.search)){
+addEventListener("error",function(e){N.err.push(String(e.message||e.error))});
+var ce=console.error;console.error=function(){N.err.push([].map.call(arguments,String).join(" ").slice(0,300));return ce.apply(console,arguments)};
+}
+log("script");
+if(!s||!window.matchMedia)return;
+if(matchMedia("(prefers-reduced-motion: reduce)").matches){log("reduced-motion: intro off");return}
 function visible(){return document.visibilityState!=="hidden"&&!document.prerendering}
-function play(){if(!s.isConnected||s.getAttribute(A)!=="wait"||!visible())return;clearTimeout(fb);s.setAttribute(A,"play")}
-function arm(){s.setAttribute(A,"wait");requestAnimationFrame(play);fb=setTimeout(play,1000)}
-function onShow(){if(visible())requestAnimationFrame(play)}
+function start(){if(s.isConnected&&s.getAttribute(A)==="wait"&&visible()){s.setAttribute(A,"play");log("play")}}
+function go(){if(s.getAttribute(A)!=="wait"||!visible())return;
+requestAnimationFrame(function(){
+if(!painted&&!fb)fb=setTimeout(function(){log("no paint entry, frame fallback");painted=true;go()},1200);
+if(painted)start()})}
+function arm(){s.setAttribute(A,"wait");log("wait");go()}
+try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;
+new PerformanceObserver(function(l,o){l.getEntries().forEach(function(e){if(e.name==="first-contentful-paint"&&!painted){painted=true;clearTimeout(fb);o.disconnect();log("fcp@"+Math.round(e.startTime));go()}})}).observe({type:"paint",buffered:true});
+}catch(e){painted=true}
+function onShow(){log("visibility");go()}
 document.addEventListener("visibilitychange",onShow);
 document.addEventListener("prerenderingchange",onShow);
-addEventListener("pageshow",function(e){
+addEventListener("pageshow",function(e){log("pageshow"+(e.persisted?" (bfcache)":""));
 if(!e.persisted||!s.isConnected||scrollY>innerHeight*0.6)return;
 s.setAttribute(A,"off");void s.offsetWidth;arm();
 });
