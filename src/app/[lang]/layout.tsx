@@ -9,6 +9,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { BackToTop } from "@/components/layout/BackToTop";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
+import { ScrollReset } from "@/components/layout/ScrollReset";
 import { SmoothAnchors } from "@/components/layout/SmoothAnchors";
 import { RestaurantJsonLd } from "@/components/JsonLd";
 import "../globals.css";
@@ -108,6 +109,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       className={`${bricolage.variable} ${jakarta.variable} ${blackHan.variable} ${notoKr.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Must run before first paint: reset scroll on reload (see ScrollReset). */}
+        <ScrollReset />
+      </head>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"

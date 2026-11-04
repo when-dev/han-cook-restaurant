@@ -301,54 +301,78 @@
   }
 }
 
-/* — Animations — */
-.sign-drop {
+/* — Animations —
+   Resting state = fully lit sign with a gentle idle hum (also what reduced motion and no-JS get).
+   The intro only applies inside a hero <section data-hero-intro> marked by the HeroIntro script:
+     "wait" = armed, paused on its first frame (page not visible yet, e.g. Safari preload)
+     "play" = plays once and rests on the final lit frame; a language switch renders a new section
+              without the attribute, so it never replays there. */
+.sign-ignite-red {
+  animation: neon-hum 5.5s ease-in-out infinite alternate;
+}
+.sign-ignite-frame {
+  animation: neon-hum 6.5s ease-in-out infinite alternate;
+}
+.sign-ignite-amber {
+  animation: neon-hum 6s ease-in-out infinite alternate;
+}
+
+[data-hero-intro] .sign-drop {
   animation:
     sign-drop 700ms cubic-bezier(0.25, 1.35, 0.5, 1) both,
     sign-fade 240ms ease-out both;
 }
-.sign-ignite-red {
+[data-hero-intro] .sign-ignite-red {
   animation:
     ignite-red 700ms linear 700ms both,
     neon-hum 5.5s ease-in-out 2.1s infinite alternate;
 }
-.sign-ignite-frame {
+[data-hero-intro] .sign-ignite-frame {
   animation:
     ignite-frame 750ms linear 1150ms both,
     neon-hum 6.5s ease-in-out 2.3s infinite alternate;
 }
-.sign-ignite-amber {
+[data-hero-intro] .sign-ignite-amber {
   animation:
     ignite-amber 450ms linear 1450ms both,
     neon-hum 6s ease-in-out 2.6s infinite alternate;
 }
-.sign-ambient {
+[data-hero-intro] .sign-ambient {
   animation: ambient-bloom 650ms ease-out 1350ms both;
 }
-.sign-subline {
+[data-hero-intro] .sign-subline {
   animation: hero-fade 500ms ease-out 1650ms both;
 }
 
 /* Hero copy: small staggered rise. Delays are short on small screens (sign sits above the
    text there and buttons must be usable immediately) and follow the sign on desktop. */
-.hero-in {
+[data-hero-intro] .hero-in {
   animation: hero-rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: var(--d-sm, 0ms);
 }
-.hero-glow-in {
+[data-hero-intro] .hero-glow-in {
   animation: hero-fade 700ms ease-in-out both;
   animation-delay: var(--d-sm, 0ms);
 }
-.hero-card-in {
+[data-hero-intro] .hero-card-in {
   animation: card-in 650ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
   animation-delay: var(--d-sm, 0ms);
 }
 @media (width >= 64rem) {
-  .hero-in,
-  .hero-glow-in,
-  .hero-card-in {
+  [data-hero-intro] :is(.hero-in, .hero-glow-in, .hero-card-in) {
     animation-delay: var(--d-lg, var(--d-sm, 0ms));
   }
+}
+/* Replay reset (bfcache restore): drop every hero animation for one style flush, so the next
+   "wait" creates them all fresh — including the idle hum, which would otherwise keep running. */
+[data-hero-intro="off"]
+  :is(.sign-drop, .sign-ignite-red, .sign-ignite-frame, .sign-ignite-amber, .sign-ambient, .sign-subline, .hero-in, .hero-glow-in, .hero-card-in) {
+  animation: none;
+}
+/* Armed but not yet visible: hold every intro animation on its first frame. */
+[data-hero-intro="wait"]
+  :is(.sign-drop, .sign-ignite-red, .sign-ignite-frame, .sign-ignite-amber, .sign-ambient, .sign-subline, .hero-in, .hero-glow-in, .hero-card-in) {
+  animation-play-state: paused;
 }
 
 @keyframes sign-drop {

@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { fmt, formatPrice } from "@/lib/format";
 import { ButtonA, buttonClass } from "@/components/ui/Button";
 import { DishIllustration } from "@/components/menu/DishArt";
+import { HeroIntro } from "./HeroIntro";
 
 function Ticket({
   id,
@@ -117,7 +118,11 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     <section
       aria-labelledby="hero-title"
       className="bg-ink grain relative isolate overflow-hidden pt-20 pb-16 md:pt-32 lg:min-h-[100svh] lg:pb-24"
+      // data-hero-intro is set by the inline HeroIntro script before hydration.
+      suppressHydrationWarning
     >
+      {/* Must stay the first child: marks this section before the sign markup is parsed. */}
+      <HeroIntro />
       {/* Night-street atmosphere */}
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <div className="bg-chili/30 absolute -top-40 right-[-10%] size-[38rem] rounded-full blur-[120px]" />
