@@ -96,7 +96,6 @@ const ko: Dictionary = {
     soon: "준비 중",
     soonNote: "링크를 준비하고 있어요",
     orderVia: "{name}로 주문하기",
-    direct: "직접 주문",
     callToOrder: "전화로 주문하고 포장해 가세요",
   },
   contact: {

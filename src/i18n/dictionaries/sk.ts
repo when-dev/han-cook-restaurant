@@ -94,7 +94,6 @@ const sk = {
     soon: "Čoskoro",
     soonNote: "Odkaz pripravujeme",
     orderVia: "Objednať cez {name}",
-    direct: "Priama objednávka",
     callToOrder: "Alebo zavolajte a vyzdvihnite si",
   },
   contact: {

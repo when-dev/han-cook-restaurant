@@ -96,7 +96,6 @@ const en: Dictionary = {
     soon: "Coming soon",
     soonNote: "Link on the way",
     orderVia: "Order via {name}",
-    direct: "Direct order",
     callToOrder: "Or call us and pick it up",
   },
   contact: {

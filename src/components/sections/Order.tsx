@@ -1,5 +1,4 @@
 import { ArrowUpRight, Phone } from "lucide-react";
-import type { CSSProperties } from "react";
 import { siteConfig, type OrderPlatform } from "@/config/site";
 import type { Dictionary } from "@/i18n";
 import { fmt } from "@/lib/format";
@@ -7,7 +6,6 @@ import { ButtonA } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 function PlatformCard({ p, dict }: { p: OrderPlatform; dict: Dictionary }) {
-  const name = p.id === "direct" ? dict.order.direct : p.name;
   const inner = (
     <>
       <span
@@ -21,7 +19,7 @@ function PlatformCard({ p, dict }: { p: OrderPlatform; dict: Dictionary }) {
           style={{ background: p.accent }}
           aria-hidden="true"
         >
-          {p.id === "direct" ? <span className="text-base font-black">한</span> : p.name[0]}
+          {p.name[0]}
         </span>
         {p.url ? (
           <ArrowUpRight className="text-cream/50 size-5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
@@ -34,7 +32,7 @@ function PlatformCard({ p, dict }: { p: OrderPlatform; dict: Dictionary }) {
       {/* Title + one description line, bottom-aligned so every card in a row lines up. */}
       <span className="mt-auto flex min-w-0 flex-col gap-1 pt-6">
         <span className="font-display text-cream text-lg leading-tight font-extrabold tracking-tight text-balance sm:text-xl">
-          {name}
+          {p.name}
         </span>
         <span className="text-mute line-clamp-2 text-sm leading-snug">
           {p.url ? fmt(dict.order.orderVia, { name: p.name }) : dict.order.soonNote}
@@ -63,15 +61,6 @@ function PlatformCard({ p, dict }: { p: OrderPlatform; dict: Dictionary }) {
   );
 }
 
-/** Grid start (in half-card tracks) for the first card of an incomplete last row, per breakpoint. */
-function lastRowStart(index: number, total: number): CSSProperties {
-  const start = (cols: number) => {
-    const rest = total % cols;
-    return rest && index === total - rest ? cols - rest + 1 : undefined;
-  };
-  return { "--start-sm": start(2), "--start-lg": start(3) } as CSSProperties;
-}
-
 export function Order({ dict }: { dict: Dictionary }) {
   return (
     <section id="order" aria-labelledby="order-title" className="bg-coal grain relative overflow-hidden py-24 md:py-28">
@@ -96,15 +85,10 @@ export function Order({ dict }: { dict: Dictionary }) {
             </ButtonA>
           </div>
         </div>
-        {/* Equal cards: 2 per row on phones/tablets, 3 on desktop. The grid has twice as many
-            tracks and every card spans two, so an incomplete last row can sit centred. */}
-        <ul className="grid auto-rows-fr grid-cols-4 gap-3 md:gap-4 lg:grid-cols-6">
-          {siteConfig.order.map((p, i, all) => (
-            <li
-              key={p.id}
-              style={lastRowStart(i, all.length)}
-              className="col-span-2 col-start-[var(--start-sm,auto)] lg:col-start-[var(--start-lg,auto)]"
-            >
+        {/* Four equal cards in a balanced 2 × 2 grid at every width. */}
+        <ul className="grid auto-rows-fr grid-cols-2 gap-3 md:gap-4">
+          {siteConfig.order.map((p) => (
+            <li key={p.id}>
               <PlatformCard p={p} dict={dict} />
             </li>
           ))}

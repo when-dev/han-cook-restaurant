@@ -1,7 +1,6 @@
 "use client";
 
 import { Menu, Phone, X } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { siteConfig } from "@/config/site";
 import { useI18n } from "@/i18n/client";
@@ -13,7 +12,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Wordmark } from "./Wordmark";
 
 export function Header() {
-  const { locale, dict } = useI18n();
+  const { dict } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<SectionId | null>(null);
@@ -92,17 +91,23 @@ export function Header() {
 
   return (
     <>
+      {/* Phones/tablets: always a plain, solid dark bar (any transparency lets the bright review
+          cards ghost through). It must not depend on JS scroll state (set only after hydration,
+          late on iOS during reload/momentum scrolling) or on
+          backdrop-filter, which iOS WebKit can drop while the composited, constantly animated
+          hero neon sits underneath — either left the bar transparent over the page.
+          Desktop keeps the transparent-at-top header that turns into frosted glass on scroll. */}
       <header
-        className={`fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow] duration-300 ${
-          scrolled || open
-            ? "bg-ink/85 shadow-[0_1px_0_rgba(255,255,255,.06),0_10px_30px_-10px_rgba(0,0,0,.6)] backdrop-blur-xl"
-            : "bg-transparent"
+        className={`fixed inset-x-0 top-0 z-40 bg-[rgb(15,12,15)] shadow-[0_1px_0_rgba(255,255,255,.06),0_10px_30px_-10px_rgba(0,0,0,.6)] transition-[background-color,box-shadow] duration-300 ${
+          scrolled || open ? "lg:bg-ink/85 lg:backdrop-blur-xl" : "lg:bg-transparent lg:shadow-none"
         }`}
       >
         <div className="container-site flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
-          <Link href={`/${locale}`} aria-label={siteConfig.fullName} onClick={onLogo} className="shrink-0">
+          {/* "#top" is the browser's own scroll-to-top: even before React has hydrated (or if
+              its JS never arrives) a tap stays on this page and language instead of reloading. */}
+          <a href="#top" aria-label={siteConfig.fullName} onClick={onLogo} className="shrink-0">
             <Wordmark />
-          </Link>
+          </a>
 
           <nav aria-label="Main" className="hidden lg:block">
             <ul className="flex items-center gap-1">

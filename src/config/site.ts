@@ -5,7 +5,7 @@
 
 const mapsQuery = encodeURIComponent("HanCook Korean Restaurant, Obchodná 531/54, 811 03 Bratislava");
 
-export type OrderPlatformId = "wolt" | "bolt" | "bistro" | "google" | "direct";
+export type OrderPlatformId = "wolt" | "bolt" | "bistro" | "google";
 
 export interface OrderPlatform {
   id: OrderPlatformId;
@@ -56,7 +56,6 @@ export const siteConfig = {
     { id: "bolt", name: "Bolt Food", url: null, accent: "#34D186" },
     { id: "bistro", name: "Bistro.sk", url: null, accent: "#FF6B3D" },
     { id: "google", name: "Google Maps", url: `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`, accent: "#FFC23D" },
-    { id: "direct", name: "HanCook", url: null, accent: "#E8202A" },
   ] satisfies OrderPlatform[] as OrderPlatform[],
 
   /** Small footer note while this is a proposal build. Set to false once approved. */

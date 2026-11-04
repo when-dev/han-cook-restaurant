@@ -1,6 +1,12 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
+	// Copies the prerendered pages into static assets (static-assets incremental cache, see
+	// open-next.config.ts). Runs before every `wrangler deploy` / `wrangler dev`, so the Worker
+	// never falls back to rendering pages per request, whichever deploy command CI uses.
+	"build": {
+		"command": "npx opennextjs-cloudflare populateCache local"
+	},
 	"name": "han-cook-restaurant",
 	"compatibility_date": "2026-11-03",
 	"compatibility_flags": [

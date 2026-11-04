@@ -62,11 +62,12 @@ export function Reviews({ locale, dict }: { locale: Locale; dict: Dictionary }) 
                 </div>
                 <blockquote className="text-ink/85 flex-1 text-[0.95rem] leading-relaxed">“{rv.text[locale]}”</blockquote>
                 <figcaption className="border-ink/10 flex items-center justify-between gap-3 border-t pt-4">
-                  <span className="flex items-center gap-2.5">
-                    <span className="bg-ink text-amber font-display flex size-9 items-center justify-center rounded-full text-xs font-extrabold">
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    {/* Fixed 36px circle: never stretched or squeezed by the flex row. */}
+                    <span className="bg-ink text-amber font-display flex size-9 shrink-0 items-center justify-center rounded-full text-xs leading-none font-extrabold">
                       {rv.author.replace(/[^A-Z]/g, "").slice(0, 2)}
                     </span>
-                    <span className="flex flex-col leading-tight">
+                    <span className="flex min-w-0 flex-col leading-tight">
                       <span className="text-ink text-sm font-bold">{rv.author}</span>
                       <span className="text-mute-ink text-xs">{r.source}</span>
                     </span>

@@ -20,5 +20,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|icon|apple-icon|opengraph-image|robots.txt|sitemap.xml|manifest.webmanifest).*)"],
+  // Locale-prefixed pages (/sk, /en, /ko…) never need the proxy: skipping it lets the Worker serve
+  // them straight from the prerendered cache. Keep in sync with `locales`.
+  matcher: [
+    "/((?!(?:sk|en|ko)(?:/|$)|_next|api|icon|apple-icon|opengraph-image|robots.txt|sitemap.xml|manifest.webmanifest).*)",
+  ],
 };
